@@ -21,29 +21,35 @@
 html,body{margin:0;padding:0}
 body{
   background:var(--bg); color:var(--ink);
-  font:400 16px/1.45 "Golos Text", "Segoe UI", system-ui, sans-serif;
+  font:400 16px/1.45 "Golos Text", "Golos fallback", "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing:antialiased;
   overscroll-behavior-y:none;
 }
-h1,h2,h3{font-family:"Unbounded","Golos Text",sans-serif;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1}
+h1,h2,h3{font-family:"Unbounded","Unbounded fallback","Golos Text",sans-serif;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1}
 img{display:block;max-width:100%}
+p,li{text-wrap:pretty}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:6px}
+
+/* запасной шрифт подогнан по ширине Golos Text: без скачка вёрстки при загрузке */
+@font-face{font-family:"Golos fallback";src:local("Arial");size-adjust:104%;ascent-override:96%;descent-override:24%;line-gap-override:0%}
+@font-face{font-family:"Unbounded fallback";src:local("Arial");size-adjust:112%;ascent-override:92%;descent-override:22%;line-gap-override:0%}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
-.screen{padding:calc(var(--top) + 18px) var(--pad) calc(var(--bottom) + 28px)}
+.screen{max-width:720px;margin:0 auto;padding:calc(var(--top) + 18px) var(--pad) calc(var(--bottom) + 28px)}
 .screen[hidden]{display:none}
 
 /* ─── список ─── */
 .head h1{font-size:clamp(28px,8.5vw,40px)}
-.head .sub{color:var(--mute);font-size:15px;margin-top:10px;max-width:34ch}
-.count{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:6px 11px;
+.head .sub{color:var(--mute);font-size:16px;margin-top:10px;max-width:34ch}
+.count{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:7px 12px;
   border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--mute)}
 .count b{color:var(--amber);font-weight:600}
 
 .filters{display:flex;gap:8px;overflow-x:auto;margin:18px -16px 0;padding:0 16px 4px;
   scrollbar-width:none}
 .filters::-webkit-scrollbar{display:none}
-.chip{flex:0 0 auto;padding:8px 14px;border:1px solid var(--line);border-radius:999px;
-  font-size:14px;color:var(--mute);white-space:nowrap;transition:.18s}
+.chip{flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;
+  font-size:16px;color:var(--mute);white-space:nowrap;transition:.18s}
 .chip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#14161A;font-weight:600}
 
 .list{display:grid;gap:14px;margin-top:18px}
@@ -53,50 +59,50 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .work .pic{display:block;position:relative;aspect-ratio:16/10;background:#15181B}
 .work .pic img{width:100%;height:100%;object-fit:cover}
 .work .tag{position:absolute;z-index:2;left:11px;bottom:11px;padding:5px 11px;border-radius:999px;
-  background:rgba(16,18,20,.86);backdrop-filter:blur(6px);font-size:12px;color:var(--ink)}
+  background:rgba(16,18,20,.86);backdrop-filter:blur(6px);font-size:13px;color:var(--ink)}
 .work .pic::after{content:"";position:absolute;z-index:1;inset:auto 0 0 0;height:78px;
   background:linear-gradient(to top,rgba(16,18,20,.55),transparent)}
 .work .body{display:block;padding:14px 15px 16px}
-.work h3{font-size:19px}
-.work p{margin:7px 0 0;color:var(--mute);font-size:14.5px;line-height:1.4}
-.work .more{margin-top:12px;font-size:14px;color:var(--amber);font-weight:600}
+.work h2{font-size:20px}
+.work p{margin:7px 0 0;color:var(--mute);font-size:16px;line-height:1.4}
+.work .more{display:block;margin-top:12px;font-size:16px;color:var(--amber);font-weight:600}
 
 /* ─── карточка ─── */
-.back{display:inline-flex;align-items:center;gap:8px;color:var(--mute);font-size:15px;margin-bottom:16px}
-.detail h2{font-size:clamp(26px,7.5vw,34px)}
+.back{display:inline-flex;align-items:center;min-height:44px;gap:8px;color:var(--mute);font-size:16px;margin-bottom:10px}
+.detail h2{font-size:clamp(26px,7.5vw,34px);text-wrap:balance}
 .detail .niche{color:var(--amber);font-size:13px;letter-spacing:.08em;text-transform:uppercase;
   font-weight:600;margin-bottom:10px}
-.detail .lead{color:var(--mute);margin-top:12px;font-size:15.5px}
+.detail .lead{color:var(--mute);margin-top:12px;font-size:16px}
 
 .frame{margin:22px 0 0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15181B}
 .frame .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .frame .dot{width:8px;height:8px;border-radius:50%;background:#33393F}
-.frame .url{margin-left:8px;font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frame .url{margin-left:8px;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .scroller{height:62vh;max-height:520px;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#0E1012}
 .scroller img{display:block;width:100%;height:auto}
-.skeleton{height:100%;display:grid;place-items:center;color:var(--mute);font-size:14px}
+.skeleton{height:100%;display:grid;place-items:center;color:var(--mute);font-size:13px}
 .hint{margin-top:9px;font-size:13px;color:var(--mute);display:flex;align-items:center;gap:7px}
 .hint svg{flex:0 0 auto}
 
 .block{margin-top:26px}
 .block h3{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
-.block p{margin:9px 0 0;font-size:15.5px;line-height:1.5}
+.block p{margin:9px 0 0;font-size:16px;line-height:1.5}
 .inside{list-style:none;padding:0;margin:11px 0 0;display:grid;gap:9px}
-.inside li{position:relative;padding-left:20px;font-size:15.5px;line-height:1.45}
+.inside li{position:relative;padding-left:20px;font-size:16px;line-height:1.45}
 .inside li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;
   border-radius:50%;background:var(--amber)}
 .key{margin-top:24px;padding:16px 17px;border:1px solid var(--line);border-left:3px solid var(--amber);
   border-radius:0 14px 14px 0;background:var(--card)}
-.key b{display:block;font-family:"Unbounded",sans-serif;font-size:15px;margin-bottom:6px}
-.key span{color:var(--mute);font-size:15px;line-height:1.5}
+.key b{display:block;font-family:"Unbounded",sans-serif;font-size:20px;line-height:1.2;margin-bottom:8px}
+.key span{color:var(--mute);font-size:16px;line-height:1.5}
 
 .actions{display:grid;gap:10px;margin-top:26px}
-.btn{display:block;width:100%;padding:15px;border-radius:14px;text-align:center;font-weight:600;font-size:16px}
+.btn{display:block;width:100%;min-height:52px;padding:15px;border-radius:14px;text-align:center;font-weight:600;font-size:16px}
 .btn-main{background:var(--amber);color:#14161A}
 .btn-ghost{border:1px solid var(--line);color:var(--ink)}
 
-.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:13.5px;line-height:1.5}
+.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:13px;line-height:1.5}
 
 .fade{opacity:0;transform:translateY(14px)}
 @media (prefers-reduced-motion:reduce){.fade{opacity:1;transform:none}}
@@ -125,83 +131,83 @@ const BASE = "https://artemkaaaaa3-sketch.github.io/";
 const WORKS = [
   {
     id:"pablo", name:"Пабло", niche:"Бар и кухня", group:"Еда",
-    short:"Меню, цены и деловые обеды — до того, как гость доедет.",
-    lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
-    task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
-    inside:["Меню кухни и барная карта с ценами","Деловые обеды с 13:00 до 17:00","Отзывы гостей и живые кадры зала","Бронь стола прямо со страницы"],
-    key:["Первый экран — про возвращение","Люди выбирают бар не по списку блюд, а по ощущению места. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
+    short:"Меню, цены и деловые обеды — до того, как гость доедет.",
+    lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
+    task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
+    inside:["Меню кухни и барная карта с ценами","Деловые обеды с 13:00 до 17:00","Отзывы гостей и живые кадры зала","Бронь стола прямо со страницы"],
+    key:["Первый экран — про возвращение","Люди выбирают бар не по списку блюд, а по ощущению места. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
     h:15800
   },
   {
     id:"emal", name:"Эмаль", niche:"Стоматология", group:"Здоровье",
-    short:"Сумма лечения считается на сайте, до звонка в клинику.",
-    lead:"Концепт сайта стоматологии: план лечения человек видит раньше, чем бормашину.",
-    task:"Пациент боится не боли, а неизвестности и суммы, которая вырастет в кресле. Поэтому сайт называет цену один раз и объясняет, что происходит внутри зуба.",
-    inside:["Расчёт стоимости лечения до звонка","Выбор врача с опытом и специализацией","Работы «до и после» с суммой и сроком","Ответы на вопросы перед первым визитом"],
-    key:["Расчёт вместо «уточняйте»","Человек отмечает, что болит, и видит вилку суммы и число визитов. Администратор перестаёт объяснять одно и то же по двадцать раз за день."],
+    short:"Сумма лечения считается на сайте, до звонка в клинику.",
+    lead:"Концепт сайта стоматологии: план лечения человек видит раньше, чем бормашину.",
+    task:"Пациент боится не боли, а неизвестности и суммы, которая вырастет в кресле. Поэтому сайт называет цену один раз и объясняет, что происходит внутри зуба.",
+    inside:["Расчёт стоимости лечения до звонка","Выбор врача с опытом и специализацией","Работы «до и после» с суммой и сроком","Ответы на вопросы перед первым визитом"],
+    key:["Расчёт вместо «уточняйте»","Человек отмечает, что болит, и видит вилку суммы и число визитов. Администратор перестаёт объяснять одно и то же по двадцать раз за день."],
     h:15800
   },
   {
     id:"karamel", name:"Карамель", niche:"Парикмахерская", group:"Красота",
-    short:"Шкала цвета считает, за сколько визитов дойдёшь до нужного тона.",
-    lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
-    task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
-    inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
-    key:["Считает время, а не только деньги","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
+    short:"Шкала цвета считает, за сколько визитов дойдёшь до нужного тона.",
+    lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
+    task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
+    inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
+    key:["Считает время, а не только деньги","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
     h:15473
   },
   {
     id:"moment", name:"Момент", niche:"Автосервис", group:"Авто",
-    short:"Срок ремонта называется до начала работ, а не после.",
-    lead:"Концепт сайта автосервиса: главный вопрос владельца — когда он заберёт машину.",
-    task:"Владельцу важнее не сумма, а сколько дней он будет без машины. Сервисы отвечают «приезжайте, посмотрим» — и теряют запись.",
-    inside:["Калькулятор простоя по видам работ","Цены и время на частые операции","Четыре шага от приёмки до выдачи","Ответы на вопросы до записи"],
-    key:["Календарь вместо прайса","Страница показывает дату выдачи. Ни один конкурент в городе так не делает — и это единственное, что человек запоминает."],
+    short:"Срок ремонта называется до начала работ, а не после.",
+    lead:"Концепт сайта автосервиса: главный вопрос владельца — когда он заберёт машину.",
+    task:"Владельцу важнее не сумма, а сколько дней он будет без машины. Сервисы отвечают «приезжайте, посмотрим» — и теряют запись.",
+    inside:["Калькулятор простоя по видам работ","Цены и время на частые операции","Четыре шага от приёмки до выдачи","Ответы на вопросы до записи"],
+    key:["Календарь вместо прайса","Страница показывает дату выдачи. Ни один конкурент в городе так не делает — и это единственное, что человек запоминает."],
     h:15800
   },
   {
     id:"zotova", name:"Марина Зотова", niche:"Психолог", group:"Услуги",
-    short:"Сайт честно пишет, с чем специалист не работает.",
-    lead:"Концепт сайта частного психолога. Имя и контакты вымышленные.",
-    task:"К психологу решаются месяцами. Страница снимает тревогу заранее: что будет на первой встрече, сколько это стоит и когда можно уйти.",
-    inside:["Список «с этим не беру» — без обтекаемых формул","Первая встреча по минутам","Одна цена без мелкого шрифта","Образование и реестр специалистов"],
-    key:["Отказ как признак профессии","Когда специалист называет то, с чем не работает, доверия становится больше, чем от списка регалий."],
+    short:"Сайт честно пишет, с чем специалист не работает.",
+    lead:"Концепт сайта частного психолога. Имя и контакты вымышленные.",
+    task:"К психологу решаются месяцами. Страница снимает тревогу заранее: что будет на первой встрече, сколько это стоит и когда можно уйти.",
+    inside:["Список «с этим не беру» — без обтекаемых формул","Первая встреча по минутам","Одна цена без мелкого шрифта","Образование и реестр специалистов"],
+    key:["Отказ как признак профессии","Когда специалист называет то, с чем не работает, доверия становится больше, чем от списка регалий."],
     h:15800
   },
   {
     id:"shary", name:"Шары", niche:"Бар и бильярд", group:"Еда",
-    short:"Столы, цены по часам и кухня — на одной странице.",
-    lead:"Концепт сайта бильярдного клуба с баром и караоке.",
-    task:"Компания выбирает место за пятнадцать минут до выхода. Ей нужно знать: есть ли свободный стол, сколько стоит час и кормят ли здесь.",
-    inside:["Залы: русский бильярд, пул, VIP-комната","Цены за час по времени суток","Барная карта и кухня","Заявка на бронь стола"],
-    key:["Цена часа на виду","Клубы прячут тариф в разделе «услуги». Здесь он на первом экране — и звонков «сколько у вас стоит» становится меньше."],
+    short:"Столы, цены по часам и кухня — на одной странице.",
+    lead:"Концепт сайта бильярдного клуба с баром и караоке.",
+    task:"Компания выбирает место за пятнадцать минут до выхода. Ей нужно знать: есть ли свободный стол, сколько стоит час и кормят ли здесь.",
+    inside:["Залы: русский бильярд, пул, VIP-комната","Цены за час по времени суток","Барная карта и кухня","Заявка на бронь стола"],
+    key:["Цена часа на виду","Клубы прячут тариф в разделе «услуги». Здесь он на первом экране — и звонков «сколько у вас стоит» становится меньше."],
     h:10694
   },
   {
     id:"kant", name:"Кант", niche:"Производство профилей", group:"Товары",
-    short:"Конфигуратор: профиль собирается под задачу прямо на странице.",
-    lead:"Концепт сайта производителя алюминиевых плинтусов и профилей.",
-    task:"Дизайнер и прораб ищут не «компанию», а конкретный профиль под шов и стену. Каталог из ста позиций читать никто не будет.",
-    inside:["Конфигуратор сечения с поворотом модели","Размеры, покрытия и палитра RAL","Как профиль крепится — по шагам","Проекты и представительства"],
-    key:["Модель, которую можно покрутить","Профиль сложно представить по фотографии. Страница даёт потянуть его в трёх измерениях — и вопрос «а как он выглядит в углу» отпадает."],
+    short:"Конфигуратор: профиль собирается под задачу прямо на странице.",
+    lead:"Концепт сайта производителя алюминиевых плинтусов и профилей.",
+    task:"Дизайнер и прораб ищут не «компанию», а конкретный профиль под шов и стену. Каталог из ста позиций читать никто не будет.",
+    inside:["Конфигуратор сечения с поворотом модели","Размеры, покрытия и палитра RAL","Как профиль крепится — по шагам","Проекты и представительства"],
+    key:["Модель, которую можно покрутить","Профиль сложно представить по фотографии. Страница даёт потянуть его в трёх измерениях — и вопрос «а как он выглядит в углу» отпадает."],
     h:15800
   },
   {
     id:"transkanada", name:"Трансканада", niche:"Авторские туры", group:"Услуги",
-    short:"14 страниц: пять маршрутов, гиды, визы и календарь заездов.",
-    lead:"Концепт многостраничного сайта туров по Канаде для групп до восьми человек.",
-    task:"Дорогую поездку выбирают долго и читают всё: кто ведёт группу, что входит в цену, как с визой. Одной страницы для этого мало.",
-    inside:["Пять маршрутов, у каждого своя страница","Пять гидов с видео о маршруте","Страница о визе и календарь заездов","Заявка на поездку с выбором даты"],
-    key:["Сайт, который не заканчивается","Четырнадцать страниц, собранных кодом из одного шаблона. Добавить шестой маршрут — полчаса, а не новый проект."],
+    short:"14 страниц: пять маршрутов, гиды, визы и календарь заездов.",
+    lead:"Концепт многостраничного сайта туров по Канаде для групп до восьми человек.",
+    task:"Дорогую поездку выбирают долго и читают всё: кто ведёт группу, что входит в цену, как с визой. Одной страницы для этого мало.",
+    inside:["Пять маршрутов, у каждого своя страница","Пять гидов с видео о маршруте","Страница о визе и календарь заездов","Заявка на поездку с выбором даты"],
+    key:["Сайт, который не заканчивается","Четырнадцать страниц, собранных кодом из одного шаблона. Добавить шестой маршрут — полчаса, а не новый проект."],
     h:15800
   },
   {
     id:"iznanka", name:"Изнанка", niche:"Студия стиля", group:"Красота",
-    short:"Цена разбора гардероба стоит на первом экране.",
-    lead:"Концепт сайта студии стиля в Пскове: разбор гардероба, шопинг и съёмка.",
-    task:"Услугу заказывают редко и не понимают, за что платят. Сайт начинается с фразы, с которой приходят клиентки: «надеть нечего».",
-    inside:["Услуги с ценами и длительностью","Как проходят три часа разбора","Где покупать в Пскове","Подарочный разбор"],
-    key:["Цена сразу, без переписки","Когда стоимость видна на первом экране, до заявки доходят те, кто готов платить. Остальные не отнимают вечер."],
+    short:"Цена разбора гардероба стоит на первом экране.",
+    lead:"Концепт сайта студии стиля в Пскове: разбор гардероба, шопинг и съёмка.",
+    task:"Услугу заказывают редко и не понимают, за что платят. Сайт начинается с фразы, с которой приходят клиентки: «надеть нечего».",
+    inside:["Услуги с ценами и длительностью","Как проходят три часа разбора","Где покупать в Пскове","Подарочный разбор"],
+    key:["Цена сразу, без переписки","Когда стоимость видна на первом экране, до заявки доходят те, кто готов платить. Остальные не отнимают вечер."],
     h:15800
   }
 ];
@@ -253,7 +259,7 @@ function drawList(){
         <span class="tag">${w.niche}</span>
       </div>
       <div class="body">
-        <h3>${w.name}</h3>
+        <h2>${w.name}</h2>
         <p>${w.short}</p>
         <span class="more">Смотреть целиком →</span>
       </div>`;
