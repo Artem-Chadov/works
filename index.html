@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<title>Работы — Артём Чадов</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#101214; --card:#1C2024; --ink:#F4F2EC; --mute:#9BA1A6;
+  --amber:#E9B44C; --line:#2A2F34;
+  --pad:16px;
+  --top:var(--tg-content-safe-area-inset-top,0px);
+  --bottom:var(--tg-safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{
+  background:var(--bg); color:var(--ink);
+  font:400 16px/1.45 "Golos Text", "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overscroll-behavior-y:none;
+}
+h1,h2,h3{font-family:"Unbounded","Golos Text",sans-serif;font-weight:800;margin:0;letter-spacing:-.02em;line-height:1.1}
+img{display:block;max-width:100%}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+.screen{padding:calc(var(--top) + 18px) var(--pad) calc(var(--bottom) + 28px)}
+.screen[hidden]{display:none}
+
+/* ─── список ─── */
+.head h1{font-size:clamp(28px,8.5vw,40px)}
+.head .sub{color:var(--mute);font-size:15px;margin-top:10px;max-width:34ch}
+.count{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:6px 11px;
+  border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--mute)}
+.count b{color:var(--amber);font-weight:600}
+
+.filters{display:flex;gap:8px;overflow-x:auto;margin:18px -16px 0;padding:0 16px 4px;
+  scrollbar-width:none}
+.filters::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:8px 14px;border:1px solid var(--line);border-radius:999px;
+  font-size:14px;color:var(--mute);white-space:nowrap;transition:.18s}
+.chip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#14161A;font-weight:600}
+
+.list{display:grid;gap:14px;margin-top:18px}
+.work{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;
+  text-align:left;width:100%;display:block;transition:border-color .18s}
+.work:active{border-color:var(--amber)}
+.work .pic{display:block;position:relative;aspect-ratio:16/10;background:#15181B}
+.work .pic img{width:100%;height:100%;object-fit:cover}
+.work .tag{position:absolute;z-index:2;left:11px;bottom:11px;padding:5px 11px;border-radius:999px;
+  background:rgba(16,18,20,.86);backdrop-filter:blur(6px);font-size:12px;color:var(--ink)}
+.work .pic::after{content:"";position:absolute;z-index:1;inset:auto 0 0 0;height:78px;
+  background:linear-gradient(to top,rgba(16,18,20,.55),transparent)}
+.work .body{display:block;padding:14px 15px 16px}
+.work h3{font-size:19px}
+.work p{margin:7px 0 0;color:var(--mute);font-size:14.5px;line-height:1.4}
+.work .more{margin-top:12px;font-size:14px;color:var(--amber);font-weight:600}
+
+/* ─── карточка ─── */
+.back{display:inline-flex;align-items:center;gap:8px;color:var(--mute);font-size:15px;margin-bottom:16px}
+.detail h2{font-size:clamp(26px,7.5vw,34px)}
+.detail .niche{color:var(--amber);font-size:13px;letter-spacing:.08em;text-transform:uppercase;
+  font-weight:600;margin-bottom:10px}
+.detail .lead{color:var(--mute);margin-top:12px;font-size:15.5px}
+
+.frame{margin:22px 0 0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15181B}
+.frame .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
+.frame .dot{width:8px;height:8px;border-radius:50%;background:#33393F}
+.frame .url{margin-left:8px;font-size:12px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.scroller{height:62vh;max-height:520px;overflow-y:auto;overflow-x:hidden;
+  -webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#0E1012}
+.scroller img{display:block;width:100%;height:auto}
+.skeleton{height:100%;display:grid;place-items:center;color:var(--mute);font-size:14px}
+.hint{margin-top:9px;font-size:13px;color:var(--mute);display:flex;align-items:center;gap:7px}
+.hint svg{flex:0 0 auto}
+
+.block{margin-top:26px}
+.block h3{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
+.block p{margin:9px 0 0;font-size:15.5px;line-height:1.5}
+.inside{list-style:none;padding:0;margin:11px 0 0;display:grid;gap:9px}
+.inside li{position:relative;padding-left:20px;font-size:15.5px;line-height:1.45}
+.inside li::before{content:"";position:absolute;left:3px;top:9px;width:6px;height:6px;
+  border-radius:50%;background:var(--amber)}
+.key{margin-top:24px;padding:16px 17px;border:1px solid var(--line);border-left:3px solid var(--amber);
+  border-radius:0 14px 14px 0;background:var(--card)}
+.key b{display:block;font-family:"Unbounded",sans-serif;font-size:15px;margin-bottom:6px}
+.key span{color:var(--mute);font-size:15px;line-height:1.5}
+
+.actions{display:grid;gap:10px;margin-top:26px}
+.btn{display:block;width:100%;padding:15px;border-radius:14px;text-align:center;font-weight:600;font-size:16px}
+.btn-main{background:var(--amber);color:#14161A}
+.btn-ghost{border:1px solid var(--line);color:var(--ink)}
+
+.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:13.5px;line-height:1.5}
+
+.fade{opacity:0;transform:translateY(14px)}
+@media (prefers-reduced-motion:reduce){.fade{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<main class="screen" id="list">
+  <div class="head">
+    <h1>Работы</h1>
+    <p class="sub">Сайты для небольшого бизнеса. Каждый открывается по ссылке — посмотрите с телефона, как он устроен.</p>
+    <span class="count"><b id="num">9</b> <span id="word">работ</span></span>
+  </div>
+  <div class="filters" id="filters"></div>
+  <div class="list" id="grid"></div>
+  <p class="foot">Сайты собраны кодом, без конструктора: быстро открываются и не требуют ежемесячной платы за шаблон. Контакты и цены в концептах вымышленные.</p>
+</main>
+
+<article class="screen" id="detail" hidden></article>
+
+<script>
+const TG = window.Telegram && window.Telegram.WebApp;
+const BOT = "artem_sites_bot";
+const BASE = "https://artemkaaaaa3-sketch.github.io/";
+
+const WORKS = [
+  {
+    id:"pablo", name:"Пабло", niche:"Бар и кухня", group:"Еда",
+    short:"Меню, цены и деловые обеды — до того, как гость доедет.",
+    lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
+    task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
+    inside:["Меню кухни и барная карта с ценами","Деловые обеды с 13:00 до 17:00","Отзывы гостей и живые кадры зала","Бронь стола прямо со страницы"],
+    key:["Первый экран — про возвращение","Люди выбирают бар не по списку блюд, а по ощущению места. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
+    h:15800
+  },
+  {
+    id:"emal", name:"Эмаль", niche:"Стоматология", group:"Здоровье",
+    short:"Сумма лечения считается на сайте, до звонка в клинику.",
+    lead:"Концепт сайта стоматологии: план лечения человек видит раньше, чем бормашину.",
+    task:"Пациент боится не боли, а неизвестности и суммы, которая вырастет в кресле. Поэтому сайт называет цену один раз и объясняет, что происходит внутри зуба.",
+    inside:["Расчёт стоимости лечения до звонка","Выбор врача с опытом и специализацией","Работы «до и после» с суммой и сроком","Ответы на вопросы перед первым визитом"],
+    key:["Расчёт вместо «уточняйте»","Человек отмечает, что болит, и видит вилку суммы и число визитов. Администратор перестаёт объяснять одно и то же по двадцать раз за день."],
+    h:15800
+  },
+  {
+    id:"karamel", name:"Карамель", niche:"Парикмахерская", group:"Красота",
+    short:"Шкала цвета считает, за сколько визитов дойдёшь до нужного тона.",
+    lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
+    task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
+    inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
+    key:["Считает время, а не только деньги","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
+    h:15473
+  },
+  {
+    id:"moment", name:"Момент", niche:"Автосервис", group:"Авто",
+    short:"Срок ремонта называется до начала работ, а не после.",
+    lead:"Концепт сайта автосервиса: главный вопрос владельца — когда он заберёт машину.",
+    task:"Владельцу важнее не сумма, а сколько дней он будет без машины. Сервисы отвечают «приезжайте, посмотрим» — и теряют запись.",
+    inside:["Калькулятор простоя по видам работ","Цены и время на частые операции","Четыре шага от приёмки до выдачи","Ответы на вопросы до записи"],
+    key:["Календарь вместо прайса","Страница показывает дату выдачи. Ни один конкурент в городе так не делает — и это единственное, что человек запоминает."],
+    h:15800
+  },
+  {
+    id:"zotova", name:"Марина Зотова", niche:"Психолог", group:"Услуги",
+    short:"Сайт честно пишет, с чем специалист не работает.",
+    lead:"Концепт сайта частного психолога. Имя и контакты вымышленные.",
+    task:"К психологу решаются месяцами. Страница снимает тревогу заранее: что будет на первой встрече, сколько это стоит и когда можно уйти.",
+    inside:["Список «с этим не беру» — без обтекаемых формул","Первая встреча по минутам","Одна цена без мелкого шрифта","Образование и реестр специалистов"],
+    key:["Отказ как признак профессии","Когда специалист называет то, с чем не работает, доверия становится больше, чем от списка регалий."],
+    h:15800
+  },
+  {
+    id:"shary", name:"Шары", niche:"Бар и бильярд", group:"Еда",
+    short:"Столы, цены по часам и кухня — на одной странице.",
+    lead:"Концепт сайта бильярдного клуба с баром и караоке.",
+    task:"Компания выбирает место за пятнадцать минут до выхода. Ей нужно знать: есть ли свободный стол, сколько стоит час и кормят ли здесь.",
+    inside:["Залы: русский бильярд, пул, VIP-комната","Цены за час по времени суток","Барная карта и кухня","Заявка на бронь стола"],
+    key:["Цена часа на виду","Клубы прячут тариф в разделе «услуги». Здесь он на первом экране — и звонков «сколько у вас стоит» становится меньше."],
+    h:10694
+  },
+  {
+    id:"kant", name:"Кант", niche:"Производство профилей", group:"Товары",
+    short:"Конфигуратор: профиль собирается под задачу прямо на странице.",
+    lead:"Концепт сайта производителя алюминиевых плинтусов и профилей.",
+    task:"Дизайнер и прораб ищут не «компанию», а конкретный профиль под шов и стену. Каталог из ста позиций читать никто не будет.",
+    inside:["Конфигуратор сечения с поворотом модели","Размеры, покрытия и палитра RAL","Как профиль крепится — по шагам","Проекты и представительства"],
+    key:["Модель, которую можно покрутить","Профиль сложно представить по фотографии. Страница даёт потянуть его в трёх измерениях — и вопрос «а как он выглядит в углу» отпадает."],
+    h:15800
+  },
+  {
+    id:"transkanada", name:"Трансканада", niche:"Авторские туры", group:"Услуги",
+    short:"14 страниц: пять маршрутов, гиды, визы и календарь заездов.",
+    lead:"Концепт многостраничного сайта туров по Канаде для групп до восьми человек.",
+    task:"Дорогую поездку выбирают долго и читают всё: кто ведёт группу, что входит в цену, как с визой. Одной страницы для этого мало.",
+    inside:["Пять маршрутов, у каждого своя страница","Пять гидов с видео о маршруте","Страница о визе и календарь заездов","Заявка на поездку с выбором даты"],
+    key:["Сайт, который не заканчивается","Четырнадцать страниц, собранных кодом из одного шаблона. Добавить шестой маршрут — полчаса, а не новый проект."],
+    h:15800
+  },
+  {
+    id:"iznanka", name:"Изнанка", niche:"Студия стиля", group:"Красота",
+    short:"Цена разбора гардероба стоит на первом экране.",
+    lead:"Концепт сайта студии стиля в Пскове: разбор гардероба, шопинг и съёмка.",
+    task:"Услугу заказывают редко и не понимают, за что платят. Сайт начинается с фразы, с которой приходят клиентки: «надеть нечего».",
+    inside:["Услуги с ценами и длительностью","Как проходят три часа разбора","Где покупать в Пскове","Подарочный разбор"],
+    key:["Цена сразу, без переписки","Когда стоимость видна на первом экране, до заявки доходят те, кто готов платить. Остальные не отнимают вечер."],
+    h:15800
+  }
+];
+
+const GROUPS = ["Все","Еда","Здоровье","Красота","Авто","Услуги","Товары"];
+let active = "Все";
+
+const $ = (s) => document.querySelector(s);
+const listEl = $("#list"), detailEl = $("#detail"), gridEl = $("#grid");
+
+function plural(n){
+  const a = Math.abs(n) % 100, b = a % 10;
+  if (a > 10 && a < 20) return "работ";
+  if (b > 1 && b < 5) return "работы";
+  if (b === 1) return "работа";
+  return "работ";
+}
+
+function haptic(style){
+  try { TG && TG.HapticFeedback && TG.HapticFeedback.impactOccurred(style || "light"); } catch (e) {}
+}
+
+function drawFilters(){
+  const box = $("#filters");
+  box.innerHTML = "";
+  GROUPS.forEach((g) => {
+    const b = document.createElement("button");
+    b.className = "chip";
+    b.textContent = g;
+    b.setAttribute("aria-pressed", String(g === active));
+    b.onclick = () => { active = g; haptic(); drawFilters(); drawList(); };
+    box.appendChild(b);
+  });
+}
+
+function drawList(){
+  const items = WORKS.filter((w) => active === "Все" || w.group === active);
+  $("#num").textContent = items.length;
+  $("#word").textContent = plural(items.length);
+  gridEl.innerHTML = "";
+  items.forEach((w) => {
+    const b = document.createElement("div");
+    b.className = "work fade";
+    b.setAttribute("role", "button");
+    b.tabIndex = 0;
+    b.innerHTML = `
+      <div class="pic">
+        <img src="shots/${w.id}.webp" alt="Первый экран сайта «${w.name}»" loading="lazy" width="1200" height="750">
+        <span class="tag">${w.niche}</span>
+      </div>
+      <div class="body">
+        <h3>${w.name}</h3>
+        <p>${w.short}</p>
+        <span class="more">Смотреть целиком →</span>
+      </div>`;
+    b.onclick = () => openWork(w.id);
+    b.onkeydown = (e) => {
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openWork(w.id); }
+    };
+    gridEl.appendChild(b);
+  });
+  reveal(gridEl.querySelectorAll(".work"));
+}
+
+function openWork(id){
+  const w = WORKS.find((x) => x.id === id);
+  if (!w) return;
+  haptic("medium");
+  detailEl.innerHTML = `
+    <button class="back" id="backBtn">← Все работы</button>
+    <div class="detail">
+      <div class="niche">${w.niche}</div>
+      <h2>${w.name}</h2>
+      <p class="lead">${w.lead}</p>
+    </div>
+    <div class="frame fade">
+      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i>
+        <span class="url">${BASE.replace("https://","")}${w.id}/</span></div>
+      <div class="scroller" id="scroller"><div class="skeleton">Загружаю страницу…</div></div>
+    </div>
+    <p class="hint">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9BA1A6" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M7 10l5-5 5 5M7 14l5 5 5-5"/></svg>
+      Листайте внутри рамки. Это верхняя часть сайта — целиком он откроется по кнопке
+    </p>
+    <div class="block fade"><h3>Задача</h3><p>${w.task}</p></div>
+    <div class="block fade"><h3>Что внутри</h3>
+      <ul class="inside">${w.inside.map((i) => `<li>${i}</li>`).join("")}</ul>
+    </div>
+    <div class="key fade"><b>${w.key[0]}</b><span>${w.key[1]}</span></div>
+    <div class="actions fade">
+      <button class="btn btn-main" id="wantBtn">Хочу такой же</button>
+      <button class="btn btn-ghost" id="openBtn">Открыть сайт целиком</button>
+    </div>
+    <p class="foot">Концепт: контакты, цены и отзывы на странице вымышленные. Ваш сайт собирается под ваше дело — со своей структурой и своими текстами.</p>`;
+
+  listEl.hidden = true;
+  detailEl.hidden = false;
+  window.scrollTo(0, 0);
+
+  const img = new Image();
+  img.width = 640; img.height = w.h;
+  img.alt = w.name + ": страница целиком";
+  img.onload = () => {
+    const sc = $("#scroller");
+    sc.innerHTML = "";
+    sc.appendChild(img);
+    nudge(sc);
+  };
+  img.src = `shots/${w.id}-full.webp`;
+
+  $("#backBtn").onclick = closeWork;
+  $("#openBtn").onclick = () => {
+    haptic();
+    const url = BASE + w.id + "/";
+    TG && TG.openLink ? TG.openLink(url) : window.open(url, "_blank");
+  };
+  $("#wantBtn").onclick = () => {
+    haptic("medium");
+    const url = `https://t.me/${BOT}?start=w_${w.id}`;
+    if (TG && TG.openTelegramLink) { TG.openTelegramLink(url); TG.close && TG.close(); }
+    else window.open(url, "_blank");
+  };
+
+  if (TG && TG.BackButton){ TG.BackButton.show(); TG.BackButton.onClick(closeWork); }
+  reveal(detailEl.querySelectorAll(".fade"));
+}
+
+function closeWork(){
+  detailEl.hidden = true;
+  detailEl.innerHTML = "";
+  listEl.hidden = false;
+  window.scrollTo(0, 0);
+  if (TG && TG.BackButton){ TG.BackButton.offClick(closeWork); TG.BackButton.hide(); }
+}
+
+/* Появление: короткий stagger. Без движения, если система просит покоя. */
+const calm = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function reveal(nodes){
+  const list = Array.from(nodes);
+  if (calm || !window.gsap){ list.forEach((n) => n.classList.remove("fade")); return; }
+  gsap.to(list, { autoAlpha:1, y:0, duration:.45, ease:"power2.out", stagger:.055,
+    onStart(){ list.forEach((n) => n.style.visibility = "visible"); },
+    onComplete(){ list.forEach((n) => { n.classList.remove("fade"); n.style.transform = ""; }); } });
+}
+
+/* Лента сайта сама проматывается на экран и останавливается — видно, что её можно листать */
+function nudge(box){
+  if (calm || !window.gsap) return;
+  gsap.fromTo(box, { scrollTop:0 }, { scrollTop:340, duration:1.5, delay:.5, ease:"power2.inOut" });
+}
+
+(function init(){
+  if (TG){
+    TG.ready();
+    TG.expand && TG.expand();
+    try { TG.setHeaderColor && TG.setHeaderColor("#101214"); } catch (e) {}
+    try { TG.setBackgroundColor && TG.setBackgroundColor("#101214"); } catch (e) {}
+    try { TG.setBottomBarColor && TG.setBottomBarColor("#101214"); } catch (e) {}
+    // вертикальный свайп закрывает приложение прямо во время прокрутки ленты сайта
+    try { TG.disableVerticalSwipes && TG.disableVerticalSwipes(); } catch (e) {}
+  }
+  drawFilters();
+  drawList();
+  // если GSAP не доедет с CDN, блоки с классом fade останутся невидимыми
+  setTimeout(() => document.querySelectorAll('.fade').forEach((n) => n.classList.remove('fade')), 1500);
+})();
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"
+  integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA=="
+  crossorigin="anonymous" referrerpolicy="no-referrer" onload="document.querySelectorAll('.fade').forEach(n=>n.classList.remove('fade'))"></script>
+</body>
+</html>
