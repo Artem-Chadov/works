@@ -17,7 +17,10 @@
   --pad:16px;
   --top:var(--tg-content-safe-area-inset-top,0px);
   --bottom:var(--tg-safe-area-inset-bottom,0px);
+  /* высота видимой части: в телеграме vh считается от вебвью, а не от того, что видно */
+  --vp:100vh;
 }
+@supports (height:100svh){:root{--vp:100svh}}
 *{box-sizing:border-box}
 html,body{margin:0;padding:0}
 body{
@@ -46,9 +49,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   border:1px solid var(--line);border-radius:999px;font-size:13px;color:var(--mute)}
 .count b{color:var(--amber);font-weight:600}
 
-.filters{display:flex;gap:8px;overflow-x:auto;margin:18px -16px 0;padding:0 16px 4px;
-  scrollbar-width:none}
-.filters::-webkit-scrollbar{display:none}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0}
 .chip{flex:0 0 auto;display:inline-flex;align-items:center;min-height:44px;padding:0 16px;border:1px solid var(--line);border-radius:999px;
   font-size:16px;color:var(--mute);white-space:nowrap;transition:.18s}
 .chip[aria-pressed="true"]{background:var(--amber);border-color:var(--amber);color:#14161A;font-weight:600}
@@ -59,35 +60,41 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .work:active{border-color:var(--amber)}
 .work .pic{display:block;position:relative;aspect-ratio:16/10;background:#15181B}
 .work .pic img{width:100%;height:100%;object-fit:cover}
-.work .tag{position:absolute;z-index:2;left:11px;bottom:11px;padding:5px 11px;border-radius:999px;
-  background:rgba(16,18,20,.86);backdrop-filter:blur(6px);font-size:13px;color:var(--ink)}
-.work .pic::after{content:"";position:absolute;z-index:1;inset:auto 0 0 0;height:78px;
-  background:linear-gradient(to top,rgba(16,18,20,.55),transparent)}
-.work .body{display:block;padding:14px 15px 16px}
+/* ниша ушла с кадра в строку имени: на кадре она ложилась на кнопки самого сайта,
+   а отдельной строкой над заголовком читалась кикером — одинаково у всех девяти */
+.work .tag{font-family:"Golos Text","Golos fallback","Segoe UI",sans-serif;
+  font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
+  color:var(--mute);font-weight:600;margin-left:9px}
+.work .body{display:block;padding:13px 15px 16px}
 .work h2{font-size:20px}
 .work p{margin:7px 0 0;color:var(--mute);font-size:16px;line-height:1.4}
 .work .more{display:block;margin-top:12px;font-size:16px;color:var(--amber);font-weight:600}
 
 /* ─── карточка ─── */
 .back{display:inline-flex;align-items:center;min-height:44px;gap:8px;color:var(--mute);font-size:16px;margin-bottom:10px}
-.detail h2{font-size:clamp(26px,7.5vw,34px);text-wrap:balance}
+.detail h1{font-size:clamp(26px,7.5vw,34px);text-wrap:balance}
+.detail h1:focus{outline:none}
 .detail .niche{color:var(--amber);font-size:13px;letter-spacing:.08em;text-transform:uppercase;
   font-weight:600;margin-bottom:10px}
 .detail .lead{color:var(--mute);margin-top:12px;font-size:16px}
 
-.frame{margin:22px 0 0;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15181B}
+.frame{margin:22px 0 0;max-width:420px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15181B}
 .frame .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .frame .dot{width:8px;height:8px;border-radius:50%;background:#33393F}
 .frame .url{margin-left:8px;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.scroller{height:62vh;max-height:520px;overflow-y:auto;overflow-x:hidden;
+/* рамка кончается выше кромки экрана, иначе подсказка под ней уходит за край */
+.scroller{height:min(520px,calc(var(--vp) - 340px));min-height:240px;overflow-y:auto;overflow-x:hidden;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#0E1012}
 .scroller img{display:block;width:100%;height:auto}
-.skeleton{height:100%;display:grid;place-items:center;color:var(--mute);font-size:13px}
-.hint{margin-top:9px;font-size:13px;color:var(--mute);display:flex;align-items:center;gap:7px}
+.skeleton{height:100%;display:grid;place-items:center;padding:0 24px;text-align:center;
+  color:var(--mute);font-size:14px;line-height:1.45}
+.hint{margin-top:9px;max-width:420px;font-size:14px;color:var(--mute);display:flex;align-items:center;gap:7px}
 .hint svg{flex:0 0 auto}
 
 .block{margin-top:26px}
-.block h3{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
+/* ярлык раздела той же роли, что «БАР И КУХНЯ» над названием: один шрифт на оба */
+.block h3{font-family:"Golos Text","Golos fallback","Segoe UI",sans-serif;
+  font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--mute);font-weight:600}
 .block p{margin:9px 0 0;font-size:16px;line-height:1.5}
 .inside{list-style:none;padding:0;margin:11px 0 0;display:grid;gap:9px}
 .inside li{position:relative;padding-left:20px;font-size:16px;line-height:1.45}
@@ -95,7 +102,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   border-radius:50%;background:var(--amber)}
 .key{margin-top:24px;padding:16px 17px;border:1px solid var(--line);border-left:3px solid var(--amber);
   border-radius:0 14px 14px 0;background:var(--card)}
-.key b{display:block;font-family:"Unbounded",sans-serif;font-size:20px;line-height:1.2;margin-bottom:8px}
+.key b{display:block;font-family:"Unbounded","Unbounded fallback",sans-serif;font-size:20px;line-height:1.2;margin-bottom:8px}
 .key span{color:var(--mute);font-size:16px;line-height:1.5}
 
 .actions{display:grid;gap:10px;margin-top:26px}
@@ -103,7 +110,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .btn-main{background:var(--amber);color:#14161A}
 .btn-ghost{border:1px solid var(--line);color:var(--ink)}
 
-.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:13px;line-height:1.5}
+.foot{margin-top:34px;padding-top:20px;border-top:1px solid var(--line);color:var(--mute);font-size:14px;line-height:1.5}
 
 .fade{opacity:0;transform:translateY(14px)}
 @media (prefers-reduced-motion:reduce){.fade{opacity:1;transform:none}}
@@ -114,7 +121,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <main class="screen" id="list">
   <div class="head">
     <h1>Работы</h1>
-    <p class="sub">Сайты для небольшого бизнеса. Каждый открывается по ссылке — посмотрите с телефона, как он устроен.</p>
+    <p class="sub">Сайты для небольшого бизнеса. Каждый можно полистать прямо здесь и открыть живьём по ссылке.</p>
     <span class="count"><b id="num">9</b> <span id="word">работ</span></span>
   </div>
   <div class="filters" id="filters"></div>
@@ -136,14 +143,14 @@ const WORKS = [
     lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
     task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
     inside:["Меню кухни и барная карта с ценами","Деловые обеды с 13:00 до 17:00","Отзывы гостей и живые кадры зала","Бронь стола прямо со страницы"],
-    key:["Первый экран — про возвращение","Люди выбирают бар не по списку блюд, а по ощущению места. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
+    key:["Первый экран — про возвращение","Бар выбирают по ощущению места, а список блюд смотрят уже потом. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
     h:15800
   },
   {
     id:"emal", name:"Эмаль", niche:"Стоматология", group:"Здоровье",
     short:"Сумма лечения считается на сайте, до звонка в клинику.",
     lead:"Концепт сайта стоматологии: план лечения человек видит раньше, чем бормашину.",
-    task:"Пациент боится не боли, а неизвестности и суммы, которая вырастет в кресле. Поэтому сайт называет цену один раз и объясняет, что происходит внутри зуба.",
+    task:"К стоматологу идут с двумя страхами: что найдут и сколько придётся заплатить, когда уже сидишь в кресле. Поэтому сайт называет цену один раз и объясняет, что происходит внутри зуба.",
     inside:["Расчёт стоимости лечения до звонка","Выбор врача с опытом и специализацией","Работы «до и после» с суммой и сроком","Ответы на вопросы перед первым визитом"],
     key:["Расчёт вместо «уточняйте»","Человек отмечает, что болит, и видит вилку суммы и число визитов. Администратор перестаёт объяснять одно и то же по двадцать раз за день."],
     h:15800
@@ -154,20 +161,20 @@ const WORKS = [
     lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
     task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
     inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
-    key:["Считает время, а не только деньги","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
-    h:15473
+    key:["Сколько часов займёт цвет","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
+    h:15800
   },
   {
-    id:"moment", name:"Момент", niche:"Автосервис", group:"Авто",
-    short:"Срок ремонта называется до начала работ, а не после.",
+    id:"moment", name:"Гараж 60", niche:"Автосервис", group:"Авто",
+    short:"Дату выдачи машины называют до начала работ.",
     lead:"Концепт сайта автосервиса: главный вопрос владельца — когда он заберёт машину.",
-    task:"Владельцу важнее не сумма, а сколько дней он будет без машины. Сервисы отвечают «приезжайте, посмотрим» — и теряют запись.",
+    task:"Сумма волнует владельца меньше, чем дни без машины. Сервисы отвечают «приезжайте, посмотрим» — и теряют запись.",
     inside:["Калькулятор простоя по видам работ","Цены и время на частые операции","Четыре шага от приёмки до выдачи","Ответы на вопросы до записи"],
     key:["Календарь вместо прайса","Страница показывает дату выдачи. Ни один конкурент в городе так не делает — и это единственное, что человек запоминает."],
     h:15800
   },
   {
-    id:"zotova", name:"Марина Зотова", niche:"Психолог", group:"Услуги",
+    id:"zotova", name:"Марина Зотова", niche:"Психолог", group:"Услуги",
     short:"Сайт честно пишет, с чем специалист не работает.",
     lead:"Концепт сайта частного психолога. Имя и контакты вымышленные.",
     task:"К психологу решаются месяцами. Страница снимает тревогу заранее: что будет на первой встрече, сколько это стоит и когда можно уйти.",
@@ -182,13 +189,13 @@ const WORKS = [
     task:"Компания выбирает место за пятнадцать минут до выхода. Ей нужно знать: есть ли свободный стол, сколько стоит час и кормят ли здесь.",
     inside:["Залы: русский бильярд, пул, VIP-комната","Цены за час по времени суток","Барная карта и кухня","Заявка на бронь стола"],
     key:["Цена часа на виду","Клубы прячут тариф в разделе «услуги». Здесь он на первом экране — и звонков «сколько у вас стоит» становится меньше."],
-    h:10694
+    h:15800
   },
   {
     id:"kant", name:"Кант", niche:"Производство профилей", group:"Товары",
     short:"Конфигуратор: профиль собирается под задачу прямо на странице.",
     lead:"Концепт сайта производителя алюминиевых плинтусов и профилей.",
-    task:"Дизайнер и прораб ищут не «компанию», а конкретный профиль под шов и стену. Каталог из ста позиций читать никто не будет.",
+    task:"Дизайнеру и прорабу нужен конкретный профиль под свой шов и свою стену. Каталог из ста позиций читать никто не будет.",
     inside:["Конфигуратор сечения с поворотом модели","Размеры, покрытия и палитра RAL","Как профиль крепится — по шагам","Проекты и представительства"],
     key:["Модель, которую можно покрутить","Профиль сложно представить по фотографии. Страница даёт потянуть его в трёх измерениях — и вопрос «а как он выглядит в углу» отпадает."],
     h:15800
@@ -218,6 +225,11 @@ let active = "Все";
 
 const $ = (s) => document.querySelector(s);
 const listEl = $("#list"), detailEl = $("#detail"), gridEl = $("#grid");
+
+let openId = null;   // какая работа открыта: кадры тяжёлые и доезжают вразнобой
+let listY = 0;       // где человек читал список
+let lastCard = null; // с какой карточки ушли
+let pushed = false;  // удалось ли завести запись в истории браузера
 
 function plural(n){
   const a = Math.abs(n) % 100, b = a % 10;
@@ -257,16 +269,15 @@ function drawList(){
     b.innerHTML = `
       <div class="pic">
         <img src="shots/${w.id}.webp" alt="Первый экран сайта «${w.name}»" loading="lazy" width="1200" height="750">
-        <span class="tag">${w.niche}</span>
       </div>
       <div class="body">
-        <h2>${w.name}</h2>
+        <h2>${w.name}<span class="tag">${w.niche}</span></h2>
         <p>${w.short}</p>
         <span class="more">Смотреть целиком →</span>
       </div>`;
-    b.onclick = () => openWork(w.id);
+    b.onclick = () => { lastCard = b; openWork(w.id); };
     b.onkeydown = (e) => {
-      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); openWork(w.id); }
+      if (e.key === "Enter" || e.key === " "){ e.preventDefault(); lastCard = b; openWork(w.id); }
     };
     gridEl.appendChild(b);
   });
@@ -281,7 +292,7 @@ function openWork(id){
     <button class="back" id="backBtn">← Все работы</button>
     <div class="detail">
       <div class="niche">${w.niche}</div>
-      <h2>${w.name}</h2>
+      <h1 id="workTitle" tabindex="-1">${w.name}</h1>
       <p class="lead">${w.lead}</p>
     </div>
     <div class="frame fade">
@@ -291,7 +302,7 @@ function openWork(id){
     </div>
     <p class="hint">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9BA1A6" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M7 10l5-5 5 5M7 14l5 5 5-5"/></svg>
-      Листайте внутри рамки. Это верхняя часть сайта — целиком он откроется по кнопке
+      Листайте внутри рамки. Это верхняя часть сайта — целиком он откроется кнопкой ниже
     </p>
     <div class="block fade"><h3>Задача</h3><p>${w.task}</p></div>
     <div class="block fade"><h3>Что внутри</h3>
@@ -302,24 +313,36 @@ function openWork(id){
       <button class="btn btn-main" id="wantBtn">Хочу такой же</button>
       <button class="btn btn-ghost" id="openBtn">Открыть сайт целиком</button>
     </div>
-    <p class="foot">Концепт: контакты, цены и отзывы на странице вымышленные. Ваш сайт собирается под ваше дело — со своей структурой и своими текстами.</p>`;
+    <p class="foot">Концепт: контакты, цены и отзывы на странице вымышленные. Ваш сайт собирается под ваше дело — со своей структурой и своими текстами.</p>`;
 
+  listY = window.scrollY;
+  openId = w.id;
   listEl.hidden = true;
   detailEl.hidden = false;
   window.scrollTo(0, 0);
+  $("#workTitle").focus({ preventScroll: true });
+  // кнопка «назад» у браузера и жест «назад» у андроида закрывают карточку, а не витрину
+  try { history.pushState({ work: w.id }, ""); pushed = true; } catch (e) { pushed = false; }
 
   const img = new Image();
   img.width = 640; img.height = w.h;
   img.alt = w.name + ": страница целиком";
   img.onload = () => {
+    if (openId !== w.id) return;   // пока кадр ехал, человек открыл другую работу
     const sc = $("#scroller");
+    if (!sc) return;
     sc.innerHTML = "";
     sc.appendChild(img);
     nudge(sc);
   };
+  img.onerror = () => {
+    if (openId !== w.id) return;
+    const sc = $("#scroller");
+    if (sc) sc.innerHTML = '<div class="skeleton">Лента не загрузилась. Сайт целиком открывается кнопкой ниже.</div>';
+  };
   img.src = `shots/${w.id}-full.webp`;
 
-  $("#backBtn").onclick = closeWork;
+  $("#backBtn").onclick = goBack;
   $("#openBtn").onclick = () => {
     haptic();
     const url = BASE + w.id + "/";
@@ -332,16 +355,27 @@ function openWork(id){
     else window.open(url, "_blank");
   };
 
-  if (TG && TG.BackButton){ TG.BackButton.show(); TG.BackButton.onClick(closeWork); }
+  if (TG && TG.BackButton){ TG.BackButton.show(); TG.BackButton.onClick(goBack); }
   reveal(detailEl.querySelectorAll(".fade"));
 }
 
+/* Закрывать карточку через историю, чтобы кнопка «назад» у браузера делала то же самое */
+function goBack(){
+  if (pushed) history.back();
+  else closeWork();
+}
+window.addEventListener("popstate", () => { if (!detailEl.hidden) closeWork(); });
+
 function closeWork(){
+  openId = null;
+  pushed = false;
   detailEl.hidden = true;
   detailEl.innerHTML = "";
   listEl.hidden = false;
-  window.scrollTo(0, 0);
-  if (TG && TG.BackButton){ TG.BackButton.offClick(closeWork); TG.BackButton.hide(); }
+  void listEl.offsetHeight;               // список снова в потоке: без этого прокрутка упирается в ноль
+  window.scrollTo(0, listY);              // человек возвращается туда, где читал
+  if (lastCard && lastCard.isConnected) lastCard.focus({ preventScroll: true });
+  if (TG && TG.BackButton){ TG.BackButton.offClick(goBack); TG.BackButton.hide(); }
 }
 
 /* Появление: короткий stagger. Без движения, если система просит покоя. */
@@ -354,16 +388,27 @@ function reveal(nodes){
     onComplete(){ list.forEach((n) => { n.classList.remove("fade"); n.style.transform = ""; }); } });
 }
 
-/* Лента сайта сама проматывается на экран и останавливается — видно, что её можно листать */
+/* Лента качается и возвращается: видно, что её листают, и первый экран работы остаётся на месте */
 function nudge(box){
   if (calm || !window.gsap) return;
-  gsap.fromTo(box, { scrollTop:0 }, { scrollTop:340, duration:1.5, delay:.5, ease:"power2.inOut" });
+  gsap.fromTo(box, { scrollTop:0 },
+    { scrollTop:150, duration:.7, delay:.5, ease:"power2.inOut", yoyo:true, repeat:1 });
+}
+
+/* В телеграме 100vh — это высота вебвью, а не то, что видно: рамка считается от видимой части */
+function syncViewport(){
+  const h = TG && TG.viewportStableHeight;
+  if (h > 0) document.documentElement.style.setProperty("--vp", h + "px");
 }
 
 (function init(){
+  // место в списке возвращаем сами: браузер после «назад» ставит свою прокрутку поверх нашей
+  try { history.scrollRestoration = "manual"; } catch (e) {}
   if (TG){
     TG.ready();
     TG.expand && TG.expand();
+    syncViewport();
+    try { TG.onEvent && TG.onEvent("viewportChanged", syncViewport); } catch (e) {}
     try { TG.setHeaderColor && TG.setHeaderColor("#101214"); } catch (e) {}
     try { TG.setBackgroundColor && TG.setBackgroundColor("#101214"); } catch (e) {}
     try { TG.setBottomBarColor && TG.setBottomBarColor("#101214"); } catch (e) {}
