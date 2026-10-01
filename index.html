@@ -140,7 +140,7 @@ const BASE = "https://artem-chadov.github.io/";
 
 const WORKS = [
   {
-    id:"pablo", name:"Пабло", niche:"Бар и кухня", group:"Еда",
+    id:"pablo", site:"pablo-pskov", name:"Пабло", niche:"Бар и кухня", group:"Еда",
     short:"Меню, цены и деловые обеды — до того, как гость доедет.",
     lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
     task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
@@ -291,7 +291,7 @@ function openWork(id){
     </div>
     <div class="frame fade">
       <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i>
-        <span class="url">${BASE.replace("https://","")}${w.id}/</span></div>
+        <span class="url">${BASE.replace("https://","")}${w.site || w.id}/</span></div>
       <div class="scroller" id="scroller"><div class="skeleton">Загружаю страницу…</div></div>
     </div>
     <p class="hint">
@@ -339,7 +339,7 @@ function openWork(id){
   $("#backBtn").onclick = goBack;
   $("#openBtn").onclick = () => {
     haptic();
-    const url = BASE + w.id + "/";
+    const url = BASE + (w.site || w.id) + "/";
     TG && TG.openLink ? TG.openLink(url) : window.open(url, "_blank");
   };
   $("#wantBtn").onclick = () => {
