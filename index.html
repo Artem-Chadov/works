@@ -141,13 +141,18 @@ const BASE = "https://artem-chadov.github.io/";
 
 const WORKS = [
   {
-    id:"pablo", site:"pablo-pskov", name:"Пабло", niche:"Бар и кухня", group:"Еда",
+    id:"pablo", site:"pablo-pskov", name:"Пабло", niche:"Бар и кухня", group:"Еда", shotVersion:"20261007",
     short:"Меню, цены и деловые обеды — до того, как гость доедет.",
-    lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
+    lead:"Концепт сайта гастропаба в Пскове: ужин, встречи с друзьями и спортивные трансляции.",
     task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
     inside:["Меню кухни и барная карта с ценами","Деловые обеды с 13:00 до 17:00","Отзывы гостей и живые кадры зала","Бронь стола прямо со страницы"],
     key:["Первый экран — про возвращение","Бар выбирают по ощущению места, а список блюд смотрят уже потом. Поэтому сверху атмосфера и повод прийти, а меню — следующим экраном."],
-    h:25487
+    frames:[
+      {file:"pablo-full-1.webp",width:1250,height:14000},
+      {file:"pablo-full-2.webp",width:1250,height:14000},
+      {file:"pablo-full-3.webp",width:1250,height:14000},
+      {file:"pablo-full-4.webp",width:1250,height:9380}
+    ]
   },
   {
     id:"sfwash", name:"SF WASH", niche:"Детейлинг", group:"Авто",
@@ -319,23 +324,34 @@ function openWork(id){
   // кнопка «назад» у браузера и жест «назад» у андроида закрывают карточку, а не витрину
   try { history.pushState({ work: w.id }, ""); pushed = true; } catch (e) { pushed = false; }
 
-  const img = new Image();
-  img.width = 640; img.height = w.h;
-  img.alt = w.name + ": страница целиком";
-  img.onload = () => {
-    if (openId !== w.id) return;   // пока кадр ехал, человек открыл другую работу
+  // WebP ограничен стороной 16383 px. Длинные кадры сохраняем частями,
+  // чтобы не уменьшать разрешение; продолжения загружаются по мере прокрутки.
+  const frames = w.frames || [{file:`${w.id}-full.webp`,width:640,height:w.h}];
+  let failed = false;
+  const images = frames.map((frame, index) => {
+    const img = new Image();
+    img.width = frame.width; img.height = frame.height;
+    img.alt = index === 0 ? w.name + ": страница целиком" : "";
+    img.loading = index === 0 ? "eager" : "lazy";
+    img.decoding = "async";
+    img.onerror = () => {
+      if (openId !== w.id) return;
+      failed = true;
+      const sc = $("#scroller");
+      if (sc) sc.innerHTML = '<div class="skeleton">Лента не загрузилась. Сайт целиком открывается кнопкой ниже.</div>';
+    };
+    return img;
+  });
+  images[0].onload = () => {
+    if (openId !== w.id || failed) return; // поздний кадр не подменяет другую работу
     const sc = $("#scroller");
     if (!sc) return;
-    sc.innerHTML = "";
-    sc.appendChild(img);
+    sc.replaceChildren(...images);
     nudge(sc);
   };
-  img.onerror = () => {
-    if (openId !== w.id) return;
-    const sc = $("#scroller");
-    if (sc) sc.innerHTML = '<div class="skeleton">Лента не загрузилась. Сайт целиком открывается кнопкой ниже.</div>';
-  };
-  img.src = `shots/${w.id}-full.webp${w.shotVersion ? "?v=" + w.shotVersion : ""}`;
+  images.forEach((img, index) => {
+    img.src = `shots/${frames[index].file}${w.shotVersion ? "?v=" + w.shotVersion : ""}`;
+  });
 
   $("#backBtn").onclick = goBack;
   $("#openBtn").onclick = () => {
