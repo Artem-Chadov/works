@@ -321,6 +321,7 @@ function openWork(id){
   detailEl.hidden = false;
   window.scrollTo(0, 0);
   $("#workTitle").focus({ preventScroll: true });
+  fitPreview();
   // кнопка «назад» у браузера и жест «назад» у андроида закрывают карточку, а не витрину
   try { history.pushState({ work: w.id }, ""); pushed = true; } catch (e) { pushed = false; }
 
@@ -406,11 +407,26 @@ function nudge(box){
     { scrollTop:150, duration:.7, delay:.5, ease:"power2.inOut", yoyo:true, repeat:1 });
 }
 
+/* Место под рамку зависит от переноса описания и подсказки на текущей ширине. */
+function fitPreview(){
+  const box = $("#scroller"), hint = detailEl.querySelector(".hint");
+  if (!box || !hint || detailEl.hidden) return;
+  let top = 0;
+  for (let el = box; el; el = el.offsetParent) top += el.offsetTop;
+  const viewport = (TG && TG.viewportStableHeight) || window.innerHeight;
+  const bottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tg-safe-area-inset-bottom")) || 0;
+  const margin = parseFloat(getComputedStyle(hint).marginTop) || 0;
+  box.style.height = Math.max(240, Math.min(520, viewport - top - hint.offsetHeight - margin - bottom - 24)) + "px";
+}
+
 /* В телеграме 100vh — это высота вебвью, а не то, что видно: рамка считается от видимой части */
 function syncViewport(){
   const h = TG && TG.viewportStableHeight;
   if (h > 0) document.documentElement.style.setProperty("--vp", h + "px");
+  fitPreview();
 }
+window.addEventListener("resize", syncViewport);
+document.fonts && document.fonts.ready.then(fitPreview);
 
 (function init(){
   // место в списке возвращаем сами: браузер после «назад» ставит свою прокрутку поверх нашей
