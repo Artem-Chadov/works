@@ -64,9 +64,10 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
    а отдельной строкой над заголовком читалась кикером — одинаково у всех девяти */
 .work .tag{font-family:"Golos Text","Golos fallback","Segoe UI",sans-serif;
   font-size:13px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;
-  color:var(--mute);font-weight:600;margin-left:9px}
+  color:var(--mute);font-weight:600}
 .work .body{display:block;padding:13px 15px 16px}
-.work h2{font-size:20px}
+/* Длинная пара «имя + ниша» переносится целиком, а не обрезается рамкой на 320–375 px. */
+.work h2{font-size:20px;display:flex;flex-wrap:wrap;align-items:baseline;gap:3px 9px}
 .work p{margin:7px 0 0;color:var(--mute);font-size:16px;line-height:1.4}
 .work .more{display:block;margin-top:12px;font-size:16px;color:var(--amber);font-weight:600}
 
@@ -140,7 +141,7 @@ const BASE = "https://artem-chadov.github.io/";
 
 const WORKS = [
   {
-    id:"pablo", site:"pablo-pskov", name:"Пабло", niche:"Бар и кухня", group:"Еда",
+    id:"pablo", site:"pablo-pskov", name:"Пабло", niche:"Бар и кухня", group:"Еда",
     short:"Меню, цены и деловые обеды — до того, как гость доедет.",
     lead:"Концепт сайта бара в Пскове: пенное, кухня и большой стол на компанию.",
     task:"Гостя ведут карты и соцсети, а решает он по фотографиям и ценам. Если меню лежит картинкой во «ВКонтакте», человек листает дальше и садится у соседей.",
@@ -171,7 +172,7 @@ const WORKS = [
     short:"Шкала цвета считает, за сколько визитов дойдёшь до нужного тона.",
     lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
     task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
-    inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
+    inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
     key:["Сколько часов займёт цвет","Клиентка отмечает свой тон и желаемый — страница показывает, сколько визитов и часов до цели. Это честнее любого прайса."],
     h:10974
   },
@@ -203,13 +204,13 @@ const WORKS = [
     h:16043
   },
   {
-    id:"iznanka", name:"Изнанка", niche:"Студия стиля", group:"Красота",
+    id:"iznanka", name:"Изнанка", niche:"Студия стиля", group:"Красота", shotVersion:"20261007",
     short:"Цена разбора гардероба стоит на первом экране.",
     lead:"Концепт сайта студии стиля в Пскове: разбор гардероба, шопинг и съёмка.",
     task:"Услугу заказывают редко и не понимают, за что платят. Сайт начинается с фразы, с которой приходят клиентки: «надеть нечего».",
-    inside:["Услуги с ценами и длительностью","Как проходят три часа разбора","Где покупать в Пскове","Подарочный разбор"],
+    inside:["Услуги с ценами и длительностью","Как проходят три часа разбора","Где покупать в Пскове","Подарочный разбор"],
     key:["Цена сразу, без переписки","Когда стоимость видна на первом экране, до заявки доходят те, кто готов платить. Остальные не отнимают вечер."],
-    h:14749
+    h:14591
   }
 ];
 
@@ -262,7 +263,7 @@ function drawList(){
     b.tabIndex = 0;
     b.innerHTML = `
       <div class="pic">
-        <img src="shots/${w.id}.webp" alt="Первый экран сайта «${w.name}»" loading="lazy" width="1200" height="750">
+        <img src="shots/${w.id}.webp${w.shotVersion ? "?v=" + w.shotVersion : ""}" alt="Первый экран сайта «${w.name}»" loading="lazy" width="1200" height="750">
       </div>
       <div class="body">
         <h2>${w.name}<span class="tag">${w.niche}</span></h2>
@@ -334,7 +335,7 @@ function openWork(id){
     const sc = $("#scroller");
     if (sc) sc.innerHTML = '<div class="skeleton">Лента не загрузилась. Сайт целиком открывается кнопкой ниже.</div>';
   };
-  img.src = `shots/${w.id}-full.webp`;
+  img.src = `shots/${w.id}-full.webp${w.shotVersion ? "?v=" + w.shotVersion : ""}`;
 
   $("#backBtn").onclick = goBack;
   $("#openBtn").onclick = () => {
