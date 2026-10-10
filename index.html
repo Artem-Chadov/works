@@ -14,8 +14,10 @@
   --bg:#101214; --card:#1C2024; --ink:#F4F2EC; --mute:#9BA1A6;
   --amber:#E9B44C; --line:#2A2F34;
   --pad:16px;
-  --top:var(--tg-content-safe-area-inset-top,0px);
-  --bottom:var(--tg-safe-area-inset-bottom,0px);
+  --top:max(var(--tg-content-safe-area-inset-top,0px),var(--tg-safe-area-inset-top,env(safe-area-inset-top,0px)));
+  --bottom:max(var(--tg-content-safe-area-inset-bottom,0px),var(--tg-safe-area-inset-bottom,env(safe-area-inset-bottom,0px)));
+  --left:max(var(--tg-content-safe-area-inset-left,0px),var(--tg-safe-area-inset-left,env(safe-area-inset-left,0px)));
+  --right:max(var(--tg-content-safe-area-inset-right,0px),var(--tg-safe-area-inset-right,env(safe-area-inset-right,0px)));
   /* высота видимой части: в телеграме vh считается от вебвью, а не от того, что видно */
   --vp:100vh;
 }
@@ -95,7 +97,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .live-status{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#15181B;color:var(--mute);font-size:14px;line-height:1.45}
 .live-status[hidden],.live-status button[hidden]{display:none}
 .live-status button{min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:9px;color:var(--amber)}
-.frame.is-expanded{position:fixed;inset:var(--top) var(--tg-safe-area-inset-right,0px) auto var(--tg-safe-area-inset-left,0px);height:calc(var(--vp) - var(--top) - var(--bottom));margin:0;max-width:none;border-radius:0;z-index:100;display:flex;flex-direction:column}
+.frame.is-expanded{position:fixed;inset:var(--top) var(--right) auto var(--left);height:calc(var(--vp) - var(--top) - var(--bottom));margin:0;max-width:none;border-radius:0;z-index:100;display:flex;flex-direction:column}
 .frame.is-expanded .bar{flex:none}
 .frame.is-expanded .scroller{flex:1;min-height:0;height:auto!important}
 body.live-view{overflow:hidden}
@@ -414,6 +416,7 @@ function loadLiveSite(w){
     }
     status.hidden = true;
     box.setAttribute("aria-busy", "false");
+    bridgePreviewKeys(iframe);
   };
   iframe.onerror = () => {
     clearTimeout(previewTimer);
@@ -423,6 +426,26 @@ function loadLiveSite(w){
   iframe.src = url;
   box.prepend(iframe);
   fitLiveSite();
+}
+
+/* События iframe не всплывают в родительский документ. Все работы живут
+   на нашем origin: Escape сначала закрывает меню сайта, затем сам просмотр. */
+function bridgePreviewKeys(iframe){
+  const doc = iframe.contentDocument;
+  if (!doc) return;
+  doc.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || !expanded || activePreview !== iframe) return;
+    const hasOverlay = Array.from(doc.querySelectorAll('[aria-expanded="true"],dialog[open],[role="dialog"]')).some((el) => {
+      if (el.closest("[hidden],[inert]")) return false;
+      const r = el.getBoundingClientRect(), cs = iframe.contentWindow.getComputedStyle(el);
+      return r.width > 0 && r.height > 0 && r.bottom > 0 && r.right > 0 &&
+        r.top < iframe.contentWindow.innerHeight && r.left < iframe.contentWindow.innerWidth &&
+        cs.visibility !== "hidden" && Number(cs.opacity) > 0;
+    });
+    if (hasOverlay) return; // не перехватывать закрытие собственной панели сайта
+    e.preventDefault();
+    setExpanded(false);
+  }, {capture:true});
 }
 
 function fitLiveSite(){
@@ -466,7 +489,10 @@ function goBack(){
   closeWork();
   if (needsBack) history.back();
 }
-window.addEventListener("popstate", () => { if (!detailEl.hidden) closeWork(); });
+window.addEventListener("popstate", (e) => {
+  if (!detailEl.hidden) closeWork();
+  else if (e.state && e.state.work) history.replaceState(null, "");
+});
 document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && expanded){ e.preventDefault(); setExpanded(false); }
 });
@@ -478,6 +504,7 @@ function closeWork(){
   document.body.classList.remove("live-view");
   openId = null;
   pushed = false;
+  try { history.replaceState(null, ""); } catch (e) {}
   detailEl.hidden = true;
   detailEl.innerHTML = "";
   listEl.hidden = false;
@@ -504,7 +531,7 @@ function fitPreview(){
   let top = 0;
   for (let el = box; el; el = el.offsetParent) top += el.offsetTop;
   const viewport = (TG && TG.viewportStableHeight) || window.innerHeight;
-  const bottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tg-safe-area-inset-bottom")) || 0;
+  const bottom = Math.max(0, (parseFloat(getComputedStyle(detailEl).paddingBottom) || 28) - 28);
   const margin = parseFloat(getComputedStyle(hint).marginTop) || 0;
   box.style.height = Math.max(240, Math.min(520, viewport - top - hint.offsetHeight - margin - bottom - 24)) + "px";
   fitLiveSite();
@@ -528,6 +555,8 @@ document.fonts && document.fonts.ready.then(fitPreview);
     TG.expand && TG.expand();
     syncViewport();
     try { TG.onEvent && TG.onEvent("viewportChanged", syncViewport); } catch (e) {}
+    try { TG.onEvent && TG.onEvent("safeAreaChanged", syncViewport); } catch (e) {}
+    try { TG.onEvent && TG.onEvent("contentSafeAreaChanged", syncViewport); } catch (e) {}
     try { TG.setHeaderColor && TG.setHeaderColor("#101214"); } catch (e) {}
     try { TG.setBackgroundColor && TG.setBackgroundColor("#101214"); } catch (e) {}
     try { TG.setBottomBarColor && TG.setBottomBarColor("#101214"); } catch (e) {}
