@@ -7,9 +7,8 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%23101214'/%3E%3Ccircle cx='16' cy='16' r='6' fill='%23E9B44C'/%3E%3C/svg%3E">
 <title>Работы — Артём Чадов</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700;800&family=Golos+Text:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preload" href="fonts/golos-text.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/unbounded-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
 <style>
 :root{
   --bg:#101214; --card:#1C2024; --ink:#F4F2EC; --mute:#9BA1A6;
@@ -33,8 +32,12 @@ h1,h2,h3{font-family:"Unbounded","Unbounded fallback","Golos Text",sans-serif;fo
 img{display:block;max-width:100%}
 p,li{text-wrap:pretty}
 :focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:6px}
+a{color:var(--amber)}
 
 /* запасной шрифт подогнан по ширине Golos Text: без скачка вёрстки при загрузке */
+@font-face{font-family:"Golos Text";src:url("fonts/golos-text.woff2") format("woff2");font-style:normal;font-weight:400 600;font-display:swap}
+@font-face{font-family:"Unbounded";src:url("fonts/unbounded-cyrillic.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:swap;unicode-range:U+0400-045F,U+0490-0491,U+04B0-04B1,U+2116}
+@font-face{font-family:"Unbounded";src:url("fonts/unbounded-latin.woff2") format("woff2");font-style:normal;font-weight:200 900;font-display:swap;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+2074,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
 @font-face{font-family:"Golos fallback";src:local("Arial");size-adjust:104%;ascent-override:96%;descent-override:24%;line-gap-override:0%}
 @font-face{font-family:"Unbounded fallback";src:local("Arial");size-adjust:112%;ascent-override:92%;descent-override:22%;line-gap-override:0%}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -82,13 +85,20 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .frame{margin:22px 0 0;max-width:420px;border:1px solid var(--line);border-radius:20px;overflow:hidden;background:#15181B}
 .frame .bar{display:flex;align-items:center;gap:6px;padding:11px 14px;border-bottom:1px solid var(--line)}
 .frame .dot{width:8px;height:8px;border-radius:50%;background:#33393F}
-.frame .url{margin-left:8px;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frame .url{flex:1;min-width:0;margin-left:2px;font-size:13px;color:var(--mute);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.frame .expand{flex:none;min-height:44px;padding:0 10px;border:1px solid var(--line);border-radius:9px;font-size:14px;color:var(--amber)}
+.frame .bar{padding:5px 8px;min-height:56px}
 /* рамка кончается выше кромки экрана, иначе подсказка под ней уходит за край */
-.scroller{height:min(520px,calc(var(--vp) - 340px));min-height:240px;overflow-y:auto;overflow-x:hidden;
+.scroller{position:relative;height:min(520px,calc(var(--vp) - 340px));min-height:240px;overflow:hidden;
   -webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#0E1012}
-.scroller img{display:block;width:100%;height:auto}
-.skeleton{height:100%;display:grid;place-items:center;padding:0 24px;text-align:center;
-  color:var(--mute);font-size:14px;line-height:1.45}
+.live-site{display:block;border:0;width:100%;height:100%;background:#fff;transform-origin:top left}
+.live-status{position:absolute;inset:0;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;background:#15181B;color:var(--mute);font-size:14px;line-height:1.45}
+.live-status[hidden],.live-status button[hidden]{display:none}
+.live-status button{min-height:44px;padding:9px 16px;border:1px solid var(--line);border-radius:9px;color:var(--amber)}
+.frame.is-expanded{position:fixed;inset:var(--top) var(--tg-safe-area-inset-right,0px) auto var(--tg-safe-area-inset-left,0px);height:calc(var(--vp) - var(--top) - var(--bottom));margin:0;max-width:none;border-radius:0;z-index:100;display:flex;flex-direction:column}
+.frame.is-expanded .bar{flex:none}
+.frame.is-expanded .scroller{flex:1;min-height:0;height:auto!important}
+body.live-view{overflow:hidden}
 .hint{margin-top:9px;max-width:420px;font-size:14px;color:var(--mute);display:flex;align-items:center;gap:7px}
 .hint svg{flex:0 0 auto}
 
@@ -123,7 +133,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 <main class="screen" id="list">
   <div class="head">
     <h1>Работы</h1>
-    <p class="sub">Сайты для небольшого бизнеса. Каждый можно полистать прямо здесь и открыть живьём по ссылке.</p>
+    <p class="sub">Сайты для небольшого бизнеса. Прямо здесь можно посмотреть анимации, открыть меню и попробовать калькуляторы.</p>
     <span class="count"><b id="num">8</b> <span id="word">работ</span></span>
   </div>
   <div class="filters" id="filters"></div>
@@ -156,7 +166,7 @@ const WORKS = [
   },
   {
     id:"sfwash", name:"SF WASH", niche:"Детейлинг", group:"Авто",
-    short:"Цена и время мойки известны до того, как машина заедет в бокс.",
+    short:"Мойка с ценой и временем до заезда в бокс.",
     lead:"Сайт детейлинг-студии в Пскове: техкарта мойки вместо «приезжайте, посмотрим».",
     task:"Детейлинг выбирают по цене за час и по страху, что «найдут ещё работ». Поэтому сайт показывает три комплекса с вилкой цены, время каждого и то, что входит в мойку по фазам.",
     inside:["Три комплекса с ценой и временем","Шкала ухода: как часто возвращаться","Мойка по фазам, с фотографиями","Зона ожидания, пока машина в боксе"],
@@ -174,7 +184,7 @@ const WORKS = [
   },
   {
     id:"karamel", name:"Карамель", niche:"Парикмахерская", group:"Красота",
-    short:"Шкала цвета считает, за сколько визитов дойдёшь до нужного тона.",
+    short:"Расчёт визитов и времени до нужного цвета.",
     lead:"Концепт сайта парикмахерской: цена окрашивания известна до записи, а не в кресле.",
     task:"Клиентка приходит с картинкой из интернета, а узнаёт цену и срок уже в кресле. Половина звонков в салон — «а сколько будет стоить?».",
     inside:["Шкала цвета: визиты, часы и вилка суммы","Цены и время рядом с каждой услугой","Мастера и их работы","Как проходит первый визит"],
@@ -226,10 +236,15 @@ let active = "Все";
 const $ = (s) => document.querySelector(s);
 const listEl = $("#list"), detailEl = $("#detail"), gridEl = $("#grid");
 
-let openId = null;   // какая работа открыта: кадры тяжёлые и доезжают вразнобой
+let openId = null;   // поздняя загрузка не должна подменять следующую работу
 let listY = 0;       // где человек читал список
 let lastCard = null; // с какой карточки ушли
 let pushed = false;  // удалось ли завести запись в истории браузера
+let activePreview = null;
+let previewTimer = null;
+let expanded = false;
+let detailY = 0;
+let desktopPreview = false;
 
 function plural(n){
   const a = Math.abs(n) % 100, b = a % 10;
@@ -273,7 +288,7 @@ function drawList(){
       <div class="body">
         <h2>${w.name}<span class="tag">${w.niche}</span></h2>
         <p>${w.short}</p>
-        <span class="more">Смотреть целиком →</span>
+        <span class="more">Открыть живой сайт →</span>
       </div>`;
     b.onclick = () => { lastCard = b; openWork(w.id); };
     b.onkeydown = (e) => {
@@ -295,14 +310,21 @@ function openWork(id){
       <h1 id="workTitle" tabindex="-1">${w.name}</h1>
       <p class="lead">${w.lead}</p>
     </div>
-    <div class="frame fade">
-      <div class="bar"><i class="dot"></i><i class="dot"></i><i class="dot"></i>
-        <span class="url">${BASE.replace("https://","")}${w.site || w.id}/</span></div>
-      <div class="scroller" id="scroller"><div class="skeleton">Загружаю страницу…</div></div>
-    </div>
+    <section class="frame" aria-label="Живой сайт «${w.name}»">
+      <div class="bar"><i class="dot" aria-hidden="true"></i>
+        <span class="url" title="${w.name}">${BASE.replace("https://","")}${w.site || w.id}/</span>
+        <button class="expand" id="deviceBtn" aria-pressed="false" title="Компьютерная версия; при смене сайт откроется заново">Компьютер</button>
+        <button class="expand" id="expandBtn" aria-pressed="false">На весь экран</button></div>
+      <div class="scroller" id="scroller" aria-busy="true">
+        <div class="live-status" id="previewStatus" role="status">
+          <span id="previewMessage">Загружаю живой сайт…</span>
+          <button id="retryBtn" hidden>Повторить загрузку</button>
+        </div>
+      </div>
+    </section>
     <p class="hint">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#9BA1A6" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M7 10l5-5 5 5M7 14l5 5 5-5"/></svg>
-      Листайте внутри рамки. Это верхняя часть сайта — целиком он откроется кнопкой ниже
+      Это живой сайт: листайте и нажимайте. Можно развернуть на весь экран или посмотреть компьютерную версию
     </p>
     <div class="block fade"><h3>Задача</h3><p>${w.task}</p></div>
     <div class="block fade"><h3>Что внутри</h3>
@@ -311,12 +333,13 @@ function openWork(id){
     <div class="key fade"><b>${w.key[0]}</b><span>${w.key[1]}</span></div>
     <div class="actions fade">
       <button class="btn btn-main" id="wantBtn">Хочу такой же</button>
-      <button class="btn btn-ghost" id="openBtn">Открыть сайт целиком</button>
+      <button class="btn btn-ghost" id="openBtn">Открыть отдельно</button>
     </div>
     <p class="foot">Концепт: контакты, цены и отзывы на странице вымышленные. Ваш сайт собирается под ваше дело — со своей структурой и своими текстами.</p>`;
 
   listY = window.scrollY;
   openId = w.id;
+  desktopPreview = false;
   listEl.hidden = true;
   detailEl.hidden = false;
   window.scrollTo(0, 0);
@@ -325,34 +348,17 @@ function openWork(id){
   // кнопка «назад» у браузера и жест «назад» у андроида закрывают карточку, а не витрину
   try { history.pushState({ work: w.id }, ""); pushed = true; } catch (e) { pushed = false; }
 
-  // WebP ограничен стороной 16383 px. Длинные кадры сохраняем частями,
-  // чтобы не уменьшать разрешение; продолжения загружаются по мере прокрутки.
-  const frames = w.frames || [{file:`${w.id}-full.webp`,width:640,height:w.h}];
-  let failed = false;
-  const images = frames.map((frame, index) => {
-    const img = new Image();
-    img.width = frame.width; img.height = frame.height;
-    img.alt = index === 0 ? w.name + ": страница целиком" : "";
-    img.loading = index === 0 ? "eager" : "lazy";
-    img.decoding = "async";
-    img.onerror = () => {
-      if (openId !== w.id) return;
-      failed = true;
-      const sc = $("#scroller");
-      if (sc) sc.innerHTML = '<div class="skeleton">Лента не загрузилась. Сайт целиком открывается кнопкой ниже.</div>';
-    };
-    return img;
-  });
-  images[0].onload = () => {
-    if (openId !== w.id || failed) return; // поздний кадр не подменяет другую работу
-    const sc = $("#scroller");
-    if (!sc) return;
-    sc.replaceChildren(...images);
-    nudge(sc);
+  loadLiveSite(w);
+  $("#retryBtn").onclick = () => loadLiveSite(w);
+  $("#expandBtn").onclick = () => setExpanded(!expanded);
+  $("#deviceBtn").onclick = () => {
+    desktopPreview = !desktopPreview;
+    $("#deviceBtn").textContent = desktopPreview ? "Телефон" : "Компьютер";
+    $("#deviceBtn").setAttribute("aria-pressed", String(desktopPreview));
+    // Часть сайтов выбирает видео/механику только при старте, не на resize.
+    loadLiveSite(w);
+    haptic();
   };
-  images.forEach((img, index) => {
-    img.src = `shots/${frames[index].file}${w.shotVersion ? "?v=" + w.shotVersion : ""}`;
-  });
 
   $("#backBtn").onclick = goBack;
   $("#openBtn").onclick = () => {
@@ -371,14 +377,105 @@ function openWork(id){
   reveal(detailEl.querySelectorAll(".fade"));
 }
 
+/* Запускается только выбранный сайт. Скриншоты остаются обложками списка,
+   но не заменяют JS, видео и интерактивные элементы самой работы. */
+function loadLiveSite(w){
+  clearTimeout(previewTimer);
+  if (activePreview) activePreview.remove();
+  const box = $("#scroller"), status = $("#previewStatus");
+  status.hidden = false;
+  $("#previewMessage").textContent = "Загружаю живой сайт…";
+  $("#retryBtn").hidden = true;
+  box.setAttribute("aria-busy", "true");
+  const iframe = document.createElement("iframe");
+  activePreview = iframe;
+  iframe.className = "live-site";
+  iframe.title = "Живой сайт «" + w.name + "»";
+  iframe.allow = "autoplay; fullscreen";
+  iframe.allowFullscreen = true;
+  const url = BASE + (w.site || w.id) + "/";
+  function problem(message){
+    if (activePreview !== iframe || openId !== w.id) return;
+    status.hidden = false;
+    $("#previewMessage").textContent = message;
+    $("#retryBtn").hidden = false;
+    box.setAttribute("aria-busy", "false");
+  }
+  iframe.onload = () => {
+    if (activePreview !== iframe || openId !== w.id) return;
+    clearTimeout(previewTimer);
+    // В опубликованной витрине origin общий: load у браузерной 404 тоже бывает.
+    if (new URL(url).origin === location.origin){
+      const doc = iframe.contentDocument;
+      if (!doc || !doc.body || !doc.body.children.length || doc.title.includes("Site not found")){
+        problem("Сайт не загрузился. Повторите попытку или откройте его отдельно ниже.");
+        return;
+      }
+    }
+    status.hidden = true;
+    box.setAttribute("aria-busy", "false");
+  };
+  iframe.onerror = () => {
+    clearTimeout(previewTimer);
+    problem("Не удалось открыть сайт. Повторите попытку или откройте его отдельно ниже.");
+  };
+  previewTimer = setTimeout(() => problem("Сайт загружается дольше обычного. Можно подождать, повторить попытку или открыть его отдельно ниже."), 20000);
+  iframe.src = url;
+  box.prepend(iframe);
+  fitLiveSite();
+}
+
+function fitLiveSite(){
+  const box = $("#scroller");
+  if (!box || !activePreview) return;
+  if (desktopPreview){
+    const width = Math.max(1280, box.clientWidth), scale = box.clientWidth / width;
+    activePreview.style.width = width + "px";
+    activePreview.style.height = (box.clientHeight / scale) + "px";
+    activePreview.style.transform = "scale(" + scale + ")";
+  } else {
+    activePreview.style.width = "100%";
+    activePreview.style.height = "100%";
+    activePreview.style.transform = "";
+  }
+}
+
+/* Меняем размер той же рамки, не создавая iframe заново: калькуляторы,
+   открытое меню, видео и место прокрутки сохраняются при развороте. */
+function setExpanded(value){
+  const frame = detailEl.querySelector(".frame"), button = $("#expandBtn");
+  if (!frame || expanded === value) return;
+  if (value) detailY = window.scrollY;
+  expanded = value;
+  frame.classList.toggle("is-expanded", value);
+  document.body.classList.toggle("live-view", value);
+  for (const el of detailEl.children) if (el !== frame) el.inert = value;
+  button.textContent = value ? "Свернуть" : "На весь экран";
+  button.setAttribute("aria-pressed", String(value));
+  if (!value){ fitPreview(); window.scrollTo(0, detailY); }
+  fitLiveSite();
+  button.focus({preventScroll:true});
+  haptic();
+}
+
 /* Закрывать карточку через историю, чтобы кнопка «назад» у браузера делала то же самое */
 function goBack(){
-  if (pushed) history.back();
-  else closeWork();
+  if (expanded){ setExpanded(false); return; }
+  const needsBack = pushed;
+  // Сначала убрать iframe: его собственные переходы не должны задерживать возврат.
+  closeWork();
+  if (needsBack) history.back();
 }
 window.addEventListener("popstate", () => { if (!detailEl.hidden) closeWork(); });
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && expanded){ e.preventDefault(); setExpanded(false); }
+});
 
 function closeWork(){
+  clearTimeout(previewTimer);
+  activePreview = null;
+  expanded = false;
+  document.body.classList.remove("live-view");
   openId = null;
   pushed = false;
   detailEl.hidden = true;
@@ -400,23 +497,17 @@ function reveal(nodes){
     onComplete(){ list.forEach((n) => { n.classList.remove("fade"); n.style.transform = ""; }); } });
 }
 
-/* Лента качается и возвращается: видно, что её листают, и первый экран работы остаётся на месте */
-function nudge(box){
-  if (calm || !window.gsap) return;
-  gsap.fromTo(box, { scrollTop:0 },
-    { scrollTop:150, duration:.7, delay:.5, ease:"power2.inOut", yoyo:true, repeat:1 });
-}
-
 /* Место под рамку зависит от переноса описания и подсказки на текущей ширине. */
 function fitPreview(){
   const box = $("#scroller"), hint = detailEl.querySelector(".hint");
-  if (!box || !hint || detailEl.hidden) return;
+  if (!box || !hint || detailEl.hidden || expanded) return;
   let top = 0;
   for (let el = box; el; el = el.offsetParent) top += el.offsetTop;
   const viewport = (TG && TG.viewportStableHeight) || window.innerHeight;
   const bottom = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--tg-safe-area-inset-bottom")) || 0;
   const margin = parseFloat(getComputedStyle(hint).marginTop) || 0;
   box.style.height = Math.max(240, Math.min(520, viewport - top - hint.offsetHeight - margin - bottom - 24)) + "px";
+  fitLiveSite();
 }
 
 /* В телеграме 100vh — это высота вебвью, а не то, что видно: рамка считается от видимой части */
@@ -424,6 +515,7 @@ function syncViewport(){
   const h = TG && TG.viewportStableHeight;
   if (h > 0) document.documentElement.style.setProperty("--vp", h + "px");
   fitPreview();
+  fitLiveSite();
 }
 window.addEventListener("resize", syncViewport);
 document.fonts && document.fonts.ready.then(fitPreview);
