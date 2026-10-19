@@ -26,7 +26,8 @@ const galleries = {
   breytovo: { title: 'Берёзовая роща на фасаде', project: 'Берёзовая роща в Брейтовском крае', surface: 'Фасад', photos: [
     { src: 'assets/breytovo-0.webp', alt: 'Осенние берёзы и река на боковом фасаде', caption: 'Боковой фасад с осенним пейзажем' },
     { src: 'assets/breytovo-1.webp', alt: 'Роспись на двух сторонах постройки', caption: 'Рисунок связывает две стороны постройки' },
-    { src: 'assets/breytovo-2.webp', alt: 'Пейзаж с берёзами на торцевой стене', caption: 'Торцевой фасад: продолжение берёзовой рощи' }
+    { src: 'assets/breytovo-2.webp', alt: 'Пейзаж с берёзами на торцевой стене', caption: 'Торцевой фасад: продолжение берёзовой рощи' },
+    { src: 'assets/breytovo-3.webp', alt: 'Настоящие осенние берёзы у воды в Брейтовском крае', caption: 'Местный пейзаж: берёзы у воды из той же поездки художника' }
   ] },
   husky: { title: 'Хаски на воротах', project: 'Хаски на воротах', surface: 'Отдельная поверхность', photos: [
     { src: 'assets/husky-1.webp', alt: 'Два хаски на воротах дачного участка', caption: 'Роспись ворот дачного участка' }
@@ -167,6 +168,7 @@ document.querySelectorAll('[data-case-image]').forEach(button => button.addEvent
   document.querySelector('#case-image').alt = image.alt;
   document.querySelector('#case-caption').textContent = image.caption;
   document.querySelector('.gallery-main').dataset.index = String(caseIndex);
+  document.querySelector('.gallery-main').setAttribute('aria-label', 'Открыть фотографию: ' + image.alt);
   document.querySelectorAll('[data-case-image]').forEach(b => b.setAttribute('aria-pressed', String(b === button)));
 }));
 function renderGallery() {

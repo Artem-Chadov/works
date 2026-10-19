@@ -24,5 +24,60 @@ h1,h2,h3,p,.surface-name,.selected-project{overflow-wrap:anywhere}
 .brand,.footer-name{min-height:44px;display:inline-flex;align-items:center}
 .contact-details .phone{min-height:48px;display:inline-flex;align-items:center}
 .place-context>div{min-width:0}
+
+/* Общие оси истории: заголовок над фотографией, вводный текст над рассказом. */
+:root{--section-space:48px;--content-gap:64px}
+.section{padding-block:var(--section-space)}
+.hero{padding-bottom:64px}
+.project-intro,.case-body,.section-heading,.contact-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:var(--content-gap)}
+.project-intro{align-items:end}
+.project-intro .section-kicker{padding:0;margin-bottom:16px}
+.project-intro .lead{margin:0;font-size:18px;max-width:48ch}
+.case-meta{margin-top:24px;gap:8px 24px}
+.case-body{margin-top:32px}
+.place-context{margin-top:64px}
+.section-heading{align-items:start;margin-bottom:32px}
+.section-heading>p{max-width:48ch}
+.works .section-heading{grid-template-columns:1fr 1fr;gap:32px}
+.approach .section-heading{grid-template-columns:1fr 1.1fr 24px;gap:32px}
+.surface-list>button{padding-inline:0}
+.questions{grid-template-columns:1.2fr 1fr;gap:var(--content-gap)}
+.preparation{background:var(--pale-blue)}
+.preparation-intro{font-size:16px;margin-top:20px;max-width:42ch}
+.preparation .section-kicker{padding-top:0}
+.preparation .questions h2{margin-top:16px;max-width:15ch}
+.preparation .surface-list{margin-top:24px;max-width:440px}
+.preparation .surface-list>button{grid-template-columns:1fr 24px;gap:16px;padding:16px 0;min-height:56px}
+.preparation .surface-name{font-size:18px;letter-spacing:-.015em}
+.preparation .surface-list svg{grid-column:2;grid-row:1;width:20px;height:20px}
+.thumbs button{flex:1;width:auto;min-width:0}
+.contact-details{justify-content:flex-start;padding-top:56px}
+.contact-details .phone{margin-top:32px}
+.contact-note{margin-top:32px}
+.text-button{text-decoration:none}
+.text-button .action-label{text-decoration:underline;text-underline-offset:5px}
+.site-footer .text-button,#remove-photo,#back-edit{text-decoration:underline}
+.text-button:hover{text-decoration:underline}
+#privacy-title{padding-right:40px}
+@media(min-width:1101px){.site-header{display:grid;grid-template-columns:1fr auto 1fr}.desktop-nav{margin-left:0}.header-cta{justify-self:end}}
+@media(max-width:1100px){:root{--content-gap:32px}.project-intro .lead{font-size:16px}.contact-details{padding-top:56px}}
+@media(max-width:760px){
+  :root{--section-space:48px}
+  .hero{padding-bottom:48px}
+  .project-intro,.case-body,.section-heading,.questions,.contact-grid{grid-template-columns:1fr}
+  .project-intro{gap:16px}
+  .project-intro .section-kicker{margin-bottom:16px}
+  .project-intro .lead{font-size:18px}
+  .case-meta{margin-top:24px;gap:8px 20px}
+  .case-meta span:last-child{flex-basis:auto}
+  .section-heading{gap:16px}
+  .works .section-heading,.approach .section-heading{grid-template-columns:1fr;gap:16px}
+  .section-heading>p{margin-top:0}
+  .place-context{margin-top:48px}
+  .contact-grid{gap:32px}
+  .contact-details{padding-top:0}
+  .contact-details .phone{margin-top:24px}
+  .contact-note{margin-top:24px}
+}
 @media(min-width:761px) and (max-width:1100px){.desktop-nav{margin-left:0}.site-header{gap:24px}.contact-grid{grid-template-columns:1.2fr 1fr}}
 @media(max-width:760px){.hero-art{padding-left:0}.hero-art:before{left:12px;right:0}.place-context>div{padding-inline:20px}.hero h1{font-size:clamp(34px,8.9vw,40px)}.contact-details .phone{font-size:28px}.hero-art figcaption{padding-left:0}}
